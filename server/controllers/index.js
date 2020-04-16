@@ -15,34 +15,41 @@ module.exports = {
 
     }, // a function which handles a get request for all messages
     post: function (req, res) {
-
-      models.messages.post(req.json, (err) => {
+      console.log('Logging to see is post is called');
+      console.log('Logging req => ', req);
+      console.log('Logging req.json => ', req.body);
+      models.messages.post(req.body, (err) => {
          if (err) {
-           res.statusCode(404);
+           res.sendStatus(404);
          } else {
-           res.statusCode(200);
+           res.sendStatus(200);
          }
       });
      // a function which handles posting a message to the database
+    }
   },
 
   users: {
     // Ditto as above
     get: function (req, res) {
-      models.messages.get((err, results) => {
+      models.users.get((err, results) => {
         if (err) {
-          res.statusCode(404);
+          res.sendStatus(404);
         } else {
-          res.statusCode(200).json(results);
+          res.sendStatus(200).json(results);
         }
       });
     },
     post: function (req, res) {
-      models.messages.post(req.json, (err) => {
+      console.log('Is this getting called? Hope So!');
+      console.log('req', req);
+      console.log('req.json', req.json);
+      models.users.post(req.body, (err) => {
         if (err) {
-          res.statusCode(404);
+          console.log(err);
+          res.sendStatus(404);
         } else {
-          res.statusCode(200);
+          res.sendStatus(200);
         }
      });
     }

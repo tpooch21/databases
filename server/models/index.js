@@ -20,20 +20,12 @@ module.exports = {
     }, // a function which produces all the messages
     post: function (thingToPost, callback) {
 
-      // thingToPost will be input object with {message: x, username: x, roomname: x}
-
-      // QUERY: INSERT INTO messages VALUES(valueforColumnA (0), valueforColumnB (?), valueforColumnC (?)) --> Auto-increment values will be ignored anyway (just put a 0)
-      // Use SELECT ^ (?) to get user ID for user that's being passed in and roomID
-      // queryArgs = [thingToPost.textmessage, thingToPost.username, thingToPost.roomname]
-
-      // USER QUERY: INSERT INTO users VALUES(0, ?)
-      // [thingToPost.username]
-
       let messageQuery = 'INSERT INTO messages VALUES(0, ?, ?, ?)'
       db.connector.connect(err => {
            if (err) {
              callback(err);
            }
+           console.log('Connected!');
 
            var userQuery = 'select id from user WHERE username = ?';
            var userArgs = [thingToPost.username];
@@ -43,13 +35,16 @@ module.exports = {
                callback(err);
              }
 
-             console.log('Logging result from userQuery => ', result);
+             console.log('Successful Query!');
+             console.log('Loggin user id result => ', result);
 
-             var messageArgs = [thingToPost.message, result, thingToPost.roomname];
+             var messageArgs = [thingToPost.message, thingToPost.roomname, result[0].id];
              db.connector.query(messageQuery, messageArgs, (err) => {
                if (err) {
                 callback(err);
                }
+
+               console.log('Successul insert!');
                callback(null);
              });
            });
@@ -80,12 +75,14 @@ module.exports = {
 
     post: function (userobject, callback) {
 
+      console.log('Checking if userPost is called!');
       let userQuery = 'INSERT INTO user VALUES(0, ?)';
       var userArgs = [userobject.username]
       db.connector.connect(err => {
            if (err) {
              callback(err);
             }
+            console.log('Success!');
 
             db.connector.query(userQuery, userArgs, (err) => {
              if (err) {
