@@ -5,50 +5,45 @@ module.exports = {
     get: function (callback) {
 
       const queryString = `select * from messages`;
-      db.connector.connect((err) => {
+
+      db.query(queryString, function(err, results) {
         if (err) {
-          callback(err);
+          console.log('error!', err);
+        } else {
+          callback(results);
         }
-        db.connector.query(queryString, function(err, results) {
-          if (err) {
-            console.log('error!', err);
-          } else {
-            callback(results);
-          }
-        });
       });
+
     }, // a function which produces all the messages
+
     post: function (thingToPost, callback) {
 
       let messageQuery = 'INSERT INTO messages VALUES(0, ?, ?, ?)'
-      db.connector.connect(err => {
-           if (err) {
-             callback(err);
-           }
-           console.log('Connected!');
 
-           var userQuery = 'select id from user WHERE username = ?';
-           var userArgs = [thingToPost.username];
+      var userQuery = 'select id from user WHERE username = ?';
+      var userArgs = [thingToPost.username];
 
-           db.connector.query(userQuery, userArgs, (err, result) => {
-             if (err) {
-               callback(err);
-             }
+      db.query(userQuery, userArgs, (err, result) => {
+        if (err) {
+          callback(err);
+        }
 
-             console.log('Successful Query!');
-             console.log('Loggin user id result => ', result);
+        console.log('Successful Query!');
+        console.log('Loggin user id result => ', result);
 
-             var messageArgs = [thingToPost.message, thingToPost.roomname, result[0].id];
-             db.connector.query(messageQuery, messageArgs, (err) => {
-               if (err) {
-                callback(err);
-               }
+        var messageArgs = [thingToPost.message, thingToPost.roomname, result[0].id];
+        console.log(result[0].id);
 
-               console.log('Successul insert!');
-               callback(null);
-             });
-           });
-         });
+        db.query(messageQuery, messageArgs, (err, results) => {
+          if (err) {
+          callback(err);
+          }
+
+          console.log('Successul insert!');
+          callback(null, results);
+        });
+      });
+
 
     } // a function which can be used to insert a message into the database
 
@@ -59,18 +54,17 @@ module.exports = {
     // Ditto as above.
     get: function () {
       const queryString = `select * from user`;
-      db.connector.connect((err) => {
+
+      console.log('Logging query string => ', queryString);
+
+      db.query(queryString, function(err, results) {
         if (err) {
-          callback(err);
+          console.log('error!', err);
+        } else {
+          callback(results);
         }
-        db.connector.query(queryString, function(err, results) {
-          if (err) {
-            console.log('error!', err);
-          } else {
-            callback(results);
-          }
-        });
       });
+
     },
 
     post: function (userobject, callback) {
@@ -78,29 +72,16 @@ module.exports = {
       console.log('Checking if userPost is called!');
       let userQuery = 'INSERT INTO user VALUES(0, ?)';
       var userArgs = [userobject.username]
-      db.connector.connect(err => {
-           if (err) {
-             callback(err);
-            }
-            console.log('Success!');
+      console.log('Logging userArgs => ', userArgs);
 
-            db.connector.query(userQuery, userArgs, (err) => {
-             if (err) {
-               callback(err);
-             }
-             callback(null);
-            });
+      db.query(userQuery, userArgs, (err, results) => {
+        if (err) {
+          callback(err);
+        }
+        callback(null, results);
       });
+
     }
   }
 
 };
-
-// message from client: {
-//  username: x
-//  textmessage: x
-//  roomname: x
-// }
-
-//'http://127.0.0.1:3000/classes/users'
-//'http://127.0.0.1:3000/classes/messages'
